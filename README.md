@@ -12,8 +12,8 @@ A simple yet beautiful cryptocurrency tracker inspired by [coinmarketcap.com](ht
 - [Inter Font](https://rsms.me/inter/)
 
 # Showcase 📸
-![home-dark](/images/home-dark.png)
 ![matic-eur-dark](/images/matic-eur-dark.png)
+![home-dark](/images/home-dark.png)
 ![home-light](/images/home-light.png)
 ![ltc-usd-light](/images/ltc-usd-light.png)
 ![currencies-light](/images/currencies-light.png)
