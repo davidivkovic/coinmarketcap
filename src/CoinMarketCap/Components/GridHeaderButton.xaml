@@ -1,0 +1,54 @@
+﻿<Primitives:Component 
+    xmlns:Primitives="clr-namespace:CoinMarketCap.Primitives"
+    x:Class="CoinMarketCap.Components.GridHeaderButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CoinMarketCap.Components" 
+            xmlns:coinmarketcap="clr-namespace:CoinMarketCap"
+            DataContext="{Binding RelativeSource={RelativeSource Self}}"
+    mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             
+    >
+    <Primitives:Component.Resources>
+        <coinmarketcap:DarkModeToBrush x:Key="DarkModeToBrush" />
+        <Style x:Key="HeaderButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Width="{TemplateBinding Width}">
+                            <ContentPresenter Cursor="Hand" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <coinmarketcap:SortToText x:Key="SortToText" />
+    </Primitives:Component.Resources>
+    <Button 
+        Style="{DynamicResource HeaderButton}"
+        Command="{Binding Command}"
+        CommandParameter="{Binding Column}"
+        Foreground="{Binding DarkMode, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource DarkModeToBrush}, ConverterParameter='#000000|#FFFFFF'}"
+    >
+        <TextBlock 
+            Margin="-10 0"
+            Padding="10 12"
+            HorizontalAlignment="{Binding HorizontalAlignment}"
+        >
+            <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource SortToText}">
+                    <Binding Path="Column"/>
+                    <Binding Path="SortedBy"/>
+                    <Binding Path="SortDirection" />
+                    <Binding Path="HorizontalAlignment" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+    </Button>
+</Primitives:Component>

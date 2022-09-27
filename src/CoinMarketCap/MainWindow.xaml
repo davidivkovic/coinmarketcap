@@ -1,0 +1,19 @@
+﻿<Primitives:Window 
+    xmlns:Primitives="clr-namespace:CoinMarketCap.Primitives"
+    x:Class="CoinMarketCap.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:CoinMarketCap"
+    mc:Ignorable="d"
+    Title="MainWindow"
+    WindowStartupLocation="CenterScreen"
+    Width="1300" Height="800"
+    FontFamily="/Fonts/#Inter"
+    DataContext="{Binding RelativeSource={RelativeSource Self}}"
+>
+    <Grid>
+        <ContentControl Content="{Binding CurrentView}"/>
+    </Grid>
+</Primitives:Window>
