@@ -28,15 +28,16 @@ Due to the positive reception by the teacher's assistant, it is now open-source 
 - Two currencies can be chosen from the top right hand dropdown.
 - Clicking a currency opens a new window with a detailed view, including the aforementioned chart.
 
+### Remarks ⁉️
+- Due to the use of the free public CoinGecko API, calls are limited to 50 per minute. The application displays according waiting messages when API quotas are hit.
+- The included CoinGecko API Client has had its' dependency on `Newtonsoft.Json` removed and replaced with `System.Text.Json`, increasing JSON parsing performance.
+- This application supports dark mode and automatically adapts to the system settings for the default app mode, even during runtime.
+- This application was built and tested using Windows 11. It is not guaranteed to work on older versions of Windows.
+
 ## Getting Started 🛠️
 1. Clone the project using git or by downloading the source code
 2. Open the solution file using Visual Studio 2022 or the latest version of Jetbrains Rider
 3. Restore NuGet Packages, Build and Run the application
-
-### Remarks ⁉️
-- This application supports dark mode and automatically adapts to the system settings for the default app mode, even during runtime.
-- The included CoinGecko API Client has had its' dependency on `Newtonsoft.Json` removed and replaced with `System.Text.Json`, massively increasing performance.
-- This application was built and tested using Windows 11. It is not guaranteed to work on older versions of Windows.
 
 ## Legal ⚖️
 I am not affiliated, associated, authorized, endorsed by, or in any way officially connected to coinmarketcap.com.
