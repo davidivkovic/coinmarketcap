@@ -21,11 +21,9 @@ A simple yet beautiful cryptocurrency tracker inspired by [coinmarketcap.com](ht
 ## Info ℹ️
 This project was initially developed during the human-computer interaction course of 2022 at the Faculty of Technical Sciences, Novi Sad.
 
-Due to the poor reception by the teacher's assistant this project scored significantly lower than the other entries. 
+Due to the positive reception by the teacher's assistant, it is now open-source and available for download.
 
-It is now open-source and available for download.
-
-- This application implements a custom high-performance charting solution, based on drawing to a canvas.
+- This application implements a custom high-performance charting solution, based on drawing paths to a canvas.
 - Multiple coins, including real-time market data and sparklines are available through pagination on the homepage.
 - Two currencies can be chosen from the top right hand dropdown.
 - Clicking a currency opens a new window with a detailed view, including the aforementioned chart.
@@ -37,6 +35,7 @@ It is now open-source and available for download.
 
 ### Remarks ⁉️
 - This application supports dark mode and automatically adapts to the system settings for the default app mode, even during runtime.
+- The included CoinGecko API Client has had its' dependency on `Newtonsoft.Json` removed and replaced with `System.Text.Json`, massively increasing performance.
 - This application was built and tested using Windows 11. It is not guaranteed to work on older versions of Windows.
 
 ## Legal ⚖️
