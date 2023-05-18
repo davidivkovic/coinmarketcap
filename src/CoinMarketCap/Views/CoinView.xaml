@@ -544,23 +544,6 @@
                             </Border>
                           </StackPanel>
                         </Grid>
-                        <!--<ItemsControl Background="Transparent" Margin="0 14 0 12" VerticalAlignment="Bottom" ItemsSource="{Binding VolumeBarHeights}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal"/>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemContainerStyle>
-                                                    <Style>
-                                                        <Setter Property="FrameworkElement.Margin" Value="1 0"/>
-                                                    </Style>
-                                                </ItemsControl.ItemContainerStyle>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Rectangle VerticalAlignment="Bottom" Width="14" Height="{Binding Path=.}" RadiusY="2" RadiusX="2" Fill="#cfd6e4"/>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>-->
                       </StackPanel>
                       <StackPanel
                         Panel.ZIndex="0"

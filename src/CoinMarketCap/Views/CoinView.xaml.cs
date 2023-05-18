@@ -12,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
 using CoinGecko.Entities.Response.Coins;
 using CoinGecko.Clients;
@@ -37,10 +36,10 @@ public partial class CoinView
     public string YPointPrice { get; private set; }
     public Point ChartPoint { get; set; }
     private Dictionary<int, Point> PathPoints { get; set; } = new();
-    public ObservableCollection<string> DescriptionRows { get; set; } = new();
+    public ObservableCollection<string> DescriptionRows { get; } = new();
     public Visibility LoadingVisibility { get; set; } = Visibility.Collapsed;
     public double LoadingOpacity { get; set; } = 1;
-    public ObservableCollection<string> Timesteps { get; set; } = new();
+    public ObservableCollection<string> Timesteps { get; } = new();
     public TimeRange TimeRange { get; set; } = new(TimeSpan.FromDays(30), "30D");
     public List<TimeRange> TimeRangeNames { get; } = new()
     {
@@ -52,8 +51,8 @@ public partial class CoinView
     };
     public string FormattedOpen => FormatMixed(Open, CultureInfo.CurrentCulture);
     readonly DecimalToVariablePrecision _variablePrecisionConverter = new();
-    public RelayCommand<TimeRange> ChangeTabCommand { get; set; }
-    public RelayCommand DismissErrorCommand { get; set; }
+    public AsyncRelayCommand<TimeRange> ChangeTabCommand { get; }
+    public RelayCommand DismissErrorCommand { get; private set; }
 
     public PriceData PriceAtPoint
     {
@@ -76,7 +75,7 @@ public partial class CoinView
         get
         {
             if (Data is null || !ResyncChart) return string.Empty;
-
+            
             decimal index = 0;
             var scale = _hResolution / (Max - Min);
 
@@ -135,15 +134,16 @@ public partial class CoinView
 
             var ratio = (double)(1 - (Open - Min) / (Max - Min));
 
-            var green = (Color)ColorConverter.ConvertFromString("#16C784");
-            var red = (Color)ColorConverter.ConvertFromString("#EA3943");
+            var green = (Color)ColorConverter.ConvertFromString("#16C784")!;
+            var red = (Color)ColorConverter.ConvertFromString("#EA3943")!;
 
-            GradientStopCollection collection = new();
-
-            collection.Add(new GradientStop(green, -0.95));
-            collection.Add(new GradientStop(Color.FromArgb(3, 131, 214, 183), ratio));
-            collection.Add(new GradientStop(Color.FromArgb(3, 247, 153, 159), ratio));
-            collection.Add(new GradientStop(red, 1.95));
+            GradientStopCollection collection = new()
+            {
+                new GradientStop(green, -0.95),
+                new GradientStop(Color.FromArgb(3, 131, 214, 183), ratio),
+                new GradientStop(Color.FromArgb(3, 247, 153, 159), ratio),
+                new GradientStop(red, 1.95)
+            };
 
             return new LinearGradientBrush(collection, angle: 90);
         }
@@ -153,30 +153,13 @@ public partial class CoinView
     {
         get
         {
-            if (Data is null) return new();
+            if (Data is null) return new List<string>();
 
             var step = (Max - Min) / 6;
 
             return Enumerable.Range(0, 7)
                 .Select(i => Max - i * step)
                 .Select(v => FormatMixed(v, CultureInfo.CurrentCulture))
-                .ToList();
-        }
-    }
-
-    public List<int> VolumeBarHeights
-    {
-        get
-        {
-            if (Data is null) return new();
-
-            var max = (decimal)Data.TotalVolumes.MaxBy(p => p[1])[1];
-            var chunkSize = Data.TotalVolumes.Length / 140;
-
-            return Data.TotalVolumes
-                .Chunk(chunkSize)
-                .Select(c => c.First())
-                .Select(v => (int)(v[1] / max * 60))
                 .ToList();
         }
     }
@@ -188,9 +171,8 @@ public partial class CoinView
             if (Data is null) return string.Empty;
 
             decimal index = 0;
-            var max = (decimal)Data.TotalVolumes.MaxBy(p => p[1])[1];
-            var min = (decimal)Data.TotalVolumes.MinBy(p => p[1])[1];
-            var avg = (decimal)Data.TotalVolumes.Average(p => p[1]);
+            var max = Data.TotalVolumes.MaxBy(p => p[1])[1] ?? 0;
+            var min = Data.TotalVolumes.MinBy(p => p[1])[1] ?? 0;
 
             var scale = 25 / (max - min);
 
@@ -260,10 +242,9 @@ public partial class CoinView
 
         Step = _wResolution / d.Prices.Length;
 
-        var open = (decimal)d.Prices[0][1];
-        var max = (decimal)d.Prices.MaxBy(p => p[1])[1];
-        var min = (decimal)d.Prices.MinBy(p => p[1])[1];
-        var avg = (decimal)d.Prices.Average(p => p?[1]);
+        var open = d.Prices[0][1] ?? 0;
+        var max = d.Prices.MaxBy(p => p[1])[1] ?? 0;
+        var min = d.Prices.MinBy(p => p[1])[1] ?? 0;
 
         var dateTimeCulture = new CultureInfo("en-US");
 
@@ -274,13 +255,13 @@ public partial class CoinView
 
             for (var i = 0; i < d.Prices.Length; i++)
             {
-                var timestamp = DateTimeOffset.FromUnixTimeMilliseconds((long)d.Prices[i][0]) + TimeSpan.FromHours(2);
+                var timestamp = DateTimeOffset.FromUnixTimeMilliseconds((long)(d.Prices[i][0] ?? 0)) + TimeSpan.FromHours(2);
                 PriceData.Add(
                     decimal.Round(i * Step, 3),
                     new PriceData(
-                        (decimal)d.Prices[i][1],
-                        (decimal)d.TotalVolumes[i][1],
-                        (decimal)d.MarketCaps[i][1],
+                        d.Prices[i][1] ?? 0,
+                        d.TotalVolumes[i][1] ?? 0,
+                        d.MarketCaps[i][1] ?? 0,
                         timestamp,
                         timestamp.DateTime.ToString("d", dateTimeCulture),
                         timestamp.DateTime.ToString("T", dateTimeCulture)
@@ -429,10 +410,10 @@ public partial class CoinView
         _coin = coin;
         Currency = currency;
 
-        ChangeTabCommand = new RelayCommand<TimeRange>(async (TimeRange r) =>
+        ChangeTabCommand = new AsyncRelayCommand<TimeRange>(async range =>
         {
             OldTimeRange = TimeRange;
-            TimeRange = r;
+            TimeRange = range;
             await FetchChart();
         });
 
@@ -445,7 +426,7 @@ public partial class CoinView
 
             Dispatcher.Invoke(() =>
             {
-                NotifuFullyRendered();
+                NotifyFullyRendered();
                 Title = $"CoinMarketCap - {CoinData?.Name} Price Chart";
             });
 

@@ -2,10 +2,9 @@
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows;
 using System.Windows.Interop;
-using CoinMarketCap.Stores;
+using Stores;
 using Microsoft.Win32;
 using PropertyChanged;
 
@@ -39,7 +38,7 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, eventArgs);
     }
 
-    public void NotifuFullyRendered()
+    public void NotifyFullyRendered()
     {
         FullyRendered?.Invoke(this, EventArgs.Empty);
     }
@@ -59,6 +58,14 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
     private static extern int DwmSetWindowAttribute(
         IntPtr hwnd,
         DwmWindomAttributeType attribute,
+        [In] ref int pvAttribute,
+        int cbAttribute
+    );
+    
+    [DllImport("dwmapi")]
+    private static extern int DwmSetWindowAttribute(
+        IntPtr hwnd,
+        DwmWindomAttributeType attribute,
         [In] ref bool pvAttribute,
         int cbAttribute
     );
@@ -67,6 +74,7 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
     private enum DwmWindomAttributeType
     {
         DWMWA_USE_IMMERSIVE_DARK_MODE = 20,
+        DWM_SYSTEMBACKDROP_TYPE = 38
     }
 
     public enum WindowThemeAttributeType : uint
@@ -80,8 +88,8 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
         public uint Mask;
     }
 
-    static readonly uint WTNCA_NODRAWCAPTION = 0x00000001;
-    readonly static uint WTNCA_NODRAWICON = 0x00000002;
+    private const uint WTNCA_NODRAWCAPTION = 0x00000001;
+    private const uint WTNCA_NODRAWICON = 0x00000002;
 
     WTA_OPTIONS wta = new () 
     { 
@@ -89,7 +97,7 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
         Mask = WTNCA_NODRAWCAPTION | WTNCA_NODRAWICON 
     };
 
-    public Window()
+    protected Window()
     {
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         QueryIsDarkMode();
@@ -100,8 +108,12 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
                 Handle = new WindowInteropHelper(this).EnsureHandle();
                 CleanTitleBar();
                 SetDarkMode();
+                SetSystemBackdropType();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         };
     }
 
@@ -118,13 +130,16 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
             var appsUseLightTheme = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "AppsUseLightTheme", "1");
             DarkMode = !Convert.ToBoolean(appsUseLightTheme);
         }
-        catch { }
+        catch
+        {
+            // ignored
+        }
     }
 
-    private int SetDarkMode()
+    private void SetDarkMode()
     {
-        bool darkMode = DarkMode;
-        return DwmSetWindowAttribute(
+        var darkMode = DarkMode;
+        DwmSetWindowAttribute(
             Handle,
             DwmWindomAttributeType.DWMWA_USE_IMMERSIVE_DARK_MODE,
             ref darkMode,
@@ -132,13 +147,30 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
         );
     }
 
-    private int CleanTitleBar()
+    private void CleanTitleBar()
     {
-        return SetWindowThemeAttribute(
+        SetWindowThemeAttribute(
             Handle,
             WindowThemeAttributeType.WTA_NONCLIENT,
             ref wta,
             (uint)Marshal.SizeOf(typeof(WTA_OPTIONS))
+        );
+    }
+
+    private void SetSystemBackdropType()
+    {
+        /*
+         int DWMSBT_DISABLE 		= 1 // Default
+         int DWMSBT_MAINWINDOW 	    = 2 // Mica
+         int DWMSBT_TRANSIENTWINDOW = 3 // Acrylic
+         int DWMSBT_TABBEDWINDOW 	= 4 // Tabbed
+        */
+        int DWMSBT_DISABLE = 1;
+        DwmSetWindowAttribute(
+            Handle,
+            DwmWindomAttributeType.DWM_SYSTEMBACKDROP_TYPE,
+            ref DWMSBT_DISABLE,
+            Marshal.SizeOf<int>()
         );
     }
 
@@ -150,7 +182,7 @@ public partial class Window : System.Windows.Window, INotifyPropertyChanged
 
     public void CenterWindowOnScreen()
     {
-        Rect workArea = SystemParameters.WorkArea;
+        var workArea = SystemParameters.WorkArea;
         Left = (workArea.Width - Width) / 2 + workArea.Left;
         Top = (workArea.Height - Height) / 2 + workArea.Top;
     }
