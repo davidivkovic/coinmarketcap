@@ -7,6 +7,10 @@
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationIcon>Assets\CoinMarketCap.ico</ApplicationIcon>
+
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +29,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\CoinMarketCap.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Fonts\Inter.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -47,9 +54,9 @@
     <Resource Include="Assets\logo_dark.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Fonts\Inter.ttf">
+    <Resource Include="Fonts\Inter.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
   </ItemGroup>
 
 </Project>

@@ -102,7 +102,7 @@ public partial class CoinView
             );
         }
     }
-
+    
     public Brush Stroke
     {
         get
@@ -110,7 +110,7 @@ public partial class CoinView
             if (Data is null) return Brushes.Transparent;
 
             var ratio = (double)(1 - (Open - Min) / (Max - Min));
-
+            
             var green = (Color)ColorConverter.ConvertFromString("#16C784")!;
             var red = (Color)ColorConverter.ConvertFromString("#EA3943")!;
 
@@ -175,10 +175,12 @@ public partial class CoinView
             var min = Data.TotalVolumes.MinBy(p => p[1])[1] ?? 0;
 
             var scale = 25 / (max - min);
-
+            
+            const char instruction = 'L';
+            
             return $"M0 {(max - min) * scale} " + Data.TotalVolumes.Aggregate("", (path, volume) =>
             {
-                const char instruction = 'L';
+                
                 path = string.Format(
                     CultureInfo.InvariantCulture,
                     "{0} {1}{2} {3:0.####}",
